@@ -121,27 +121,43 @@ CommandList * getListOfCommands(char * inputString){
     CommandType command;
     command.argc = 0;
     command.arguments = createStringList();
+    int count = 0;
+    char *token = strtok(inputString, " ");
 
-    char *token = strtok(inputString," ");
+    // Retirando a quebra de linha da string
+    while (count < strlen(inputString)) {
+        if (inputString[count] == '\n') { // Encontrou a quebra de linha
+            inputString[count] = '\0';
+            // printf("Tem quebra de linha\n");
+        }
+        count ++;
+    }
+    
+
     while (token != NULL){  
         token[strlen(token)] = '\0';  
+
         if(strcmp(token, "&&") == 0 || strcmp(token, "|") == 0 || strcmp(token, ">") == 0 || strcmp(token, "<") == 0){
             newCommand = 0;
             insertCommandList(commandList, command);
             command.arguments = createStringList();
+
         }else if(strcmp(token, "sair") == 0){
             exit(EXIT_SUCCESS);
+
         }else if(newCommand == 0){
             strcpy(command.command,token);
             insertStringList(command.arguments,token);
             command.direcionamento = 0;
             command.argc = 1;
             newCommand = 1;
+
         }else{
             insertStringList(command.arguments,token);
             command.argc += 1;
             newCommand = 1;
         }
+
         token = strtok (NULL," \n");
     }
     if(newCommand == 1){
@@ -160,6 +176,7 @@ int main(){
     while (flagSair == FALSE){
         printf("<VESH>: ");
         fgets(inputString, MAX_COMMAND_LINE_SIZE, stdin);
+
         //RETORNA UMA LISTA COM OS COMANDOS
         commandList = getListOfCommands(inputString);
         
