@@ -73,6 +73,7 @@ typedef struct CommandType{
     StringList * arguments;
     int argc;
     int direcionamento;
+    char direcionamentoType[3]; // Guarda qual foi o redirecionamento
 }CommandType;
 
 typedef struct CommandTypeNode{
@@ -133,27 +134,27 @@ CommandList * getListOfCommands(char * inputString){
         count ++;
     }
     
-
     while (token != NULL){  
         token[strlen(token)] = '\0';  
 
         if(strcmp(token, "&&") == 0 || strcmp(token, "|") == 0 || strcmp(token, ">") == 0 || strcmp(token, "<") == 0){
             newCommand = 0;
+            command.direcionamento = 1; // Informando que teve direcionamento
+            strcpy(command.direcionamentoType, token);  // Guardando qual foi o redirecionamento
             insertCommandList(commandList, command);
             command.arguments = createStringList();
-
         }else if(strcmp(token, "sair") == 0){
             exit(EXIT_SUCCESS);
 
         }else if(newCommand == 0){
-            strcpy(command.command,token);
-            insertStringList(command.arguments,token);
+            strcpy(command.command, token);
+            insertStringList(command.arguments, token);
             command.direcionamento = 0;
             command.argc = 1;
             newCommand = 1;
 
         }else{
-            insertStringList(command.arguments,token);
+            insertStringList(command.arguments, token);
             command.argc += 1;
             newCommand = 1;
         }
@@ -187,9 +188,14 @@ int main(){
             printf("Comando: %s\nargc: %d\ndirecionamento %d\nArgumentos: ", aux->command.command, aux->command.argc, aux->command.direcionamento);
             aux2 = aux->command.arguments->first;
             while(aux2 != NULL){
-                printf("%s ",aux2->string);
+                printf("%s ", aux2->string);
                 aux2 = aux2->next;
             }
+
+            if (aux->command.direcionamento == 1) { // Mostra redirecionamento caso exista
+                printf("\nRedirecionamento: %s", aux->command.direcionamentoType); 
+            }
+            
             printf("\n\n");
             aux = aux->next;
         }
